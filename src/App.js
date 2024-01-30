@@ -1,25 +1,27 @@
-
-import './App.css';
-import Descripcion from './Descripcion';
-import Mensaje from './Mensaje';
-
-
-
-
 const App = () => {
-  const msj = 'hola unix';
+  const course = 'Half Stack application development'
+  const part1 = 'Fundamentals of React'
+  const exercises1 = 10
+  const part2 = 'Using props to pass data'
+  const exercises2 = 7
+  const part3 = 'State of a component'
+  const exercises3 = 14
+
   return (
-    <div className="App">
-      <Mensaje color='red' text='hola, '/>
-      <Mensaje color='black' text='bienvenidos'/>
-      <Mensaje color='green' text='comunidad'/>
-      <Mensaje color='orange' text='al desarrollo'/>
-      <br/>
-      {msj + ': iniciando un sistema'}
-      <br/>
-      <Descripcion/>
+    <div>
+      <h1>{course}</h1>
+      <p>
+        {part1} {exercises1}
+      </p>
+      <p>
+        {part2} {exercises2}
+      </p>
+      <p>
+        {part3} {exercises3}
+      </p>
+      <p>Number of exercises {exercises1 + exercises2 + exercises3}</p>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
