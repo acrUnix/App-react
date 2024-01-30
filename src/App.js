@@ -1,25 +1,25 @@
+import Tit from "./Tit";
+import Text from "./Text";
+import Result from "./Result";
+
 const App = () => {
-  const course = 'Half Stack application development'
+  const course = 'Full Stack application development'
   const part1 = 'Fundamentals of React'
-  const exercises1 = 10
+  const exercises1 = 4
   const part2 = 'Using props to pass data'
-  const exercises2 = 7
+  const exercises2 = 2
   const part3 = 'State of a component'
-  const exercises3 = 14
+  const exercises3 = 1
 
   return (
     <div>
-      <h1>{course}</h1>
-      <p>
-        {part1} {exercises1}
-      </p>
-      <p>
-        {part2} {exercises2}
-      </p>
-      <p>
-        {part3} {exercises3}
-      </p>
-      <p>Number of exercises {exercises1 + exercises2 + exercises3}</p>
+      <Tit prueba={course}/>
+
+      <Text par={part1} exe={exercises1}/>
+      <Text par={part2} exe={exercises2}/>
+      <Text par={part3} exe={exercises3}/>
+
+      <Result  ex1={exercises1} ex2={exercises2} ex3={exercises3}/>
     </div>
   )
 }
