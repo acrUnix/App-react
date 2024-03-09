@@ -1,6 +1,13 @@
 import axios from "axios"
 
+let token = null
 const baseUrl = 'http://localhost:3001/api/notes'
+
+
+const tokenUser = tok => {
+    token = `Bearer ${tok}`
+}
+
 
 const getAllNotes = async () => {
     return await axios.get(`${baseUrl}/allnotes`)
@@ -11,13 +18,19 @@ const getAllNotes = async () => {
 }
 
 
-const postNotes = async newNts => {
-    return await axios.post(`${baseUrl}/newnote`, newNts)
+const postNotes = async (newNts) => {
+    const config = {
+        headers: {
+            Authorization: token
+        }
+    }
+    return await axios.post(`${baseUrl}/newnote`, newNts, config)
     .then(response => {
+        console.log('note created on client: ', response.data)
         return response.data
     })
     .catch(error => {
-        console.log(error)
+        console.log('fallo la operacion: ', error.message)
     })
 }
 
@@ -26,7 +39,4 @@ const postNotes = async newNts => {
     return axios.put(`${baseUrl}/${id}`, newObject)
   }*/
 
-export {
-    getAllNotes,
-    postNotes
-}
+export { getAllNotes, postNotes, tokenUser }

@@ -1,7 +1,10 @@
-import  RenderList  from "./render"
+import { RenderListNotes } from "./components/renderListNotes"
 import { useState, useEffect } from "react"
-import { getAllNotes, postNotes } from "./services/notes/axiosNotes"
+import { getAllNotes, postNotes, tokenUser } from "./services/notes/axiosNotes"
 import { loginUser } from "./services/users.js/axiosUsers"
+import { RenderCreateNotes } from "./components/renderCreateNotes"
+import { LoginForm } from "./components/loginForm"
+import Togglable from "./components/togglable"
 
 
 
@@ -9,98 +12,124 @@ import { loginUser } from "./services/users.js/axiosUsers"
 const App = () => {
     
     const [notes, setNotes] = useState([])
-    const [newNotes, setNewNotes] = useState('')
-    const [loading, setLoading] = useState(false)
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [datosUser, setDatos] = useState('')
+    const [loginVisible, setLoginVisible] = useState(false)
+    const [user, setUser] = useState('')
 
 
     useEffect(()=>{
-        setLoading(true)
-        
         getAllNotes()
         .then(data => {
             console.log('se encontro 2: ', data)
             setNotes(data)
-            setLoading(false)
         })
             
     }, [])
 
-    const handleChange = (event)=>{
 
-        const newNot = event.target.value
-        setNewNotes(newNot)
-    }
+    useEffect(() => {
+        const loggedUser = window.localStorage.getItem('userSession')
+        if (loggedUser) {
+          const user = JSON.parse(loggedUser)
+          setUser(user)
+          tokenUser(user.token)
+        }
+      }, [])
 
-    const handleLoginChange = (event) => {
+
+
+    const handleLogin = async (event) => {
         event.preventDefault()
+        try{
         const datos = {
             username,
             password
         }
-        console.log('datos enviados: ', datos)
-        loginUser(datos)
+        await loginUser(datos)
         .then(user => {
-            console.log('se actualizo setDatos con: ', user.name)
-            setDatos(user.name)
+            console.log(user.name, ' ha iniciado sesion')
+            console.log('con id: ', user.id)
+            window.localStorage.setItem(
+                'userSession', JSON.stringify(user)
+              )
+            setUser(user)
+            setUsername('')
+            setPassword('')
         })
+    } catch (error){
+            console.log(error)
+        }
+        
     }
 
 
-    const createNote = async (event) => {
-        event.preventDefault();
-        const newNs = {
-            name: 'colosal',
-            country: 'eeuu',
-            userId: '65dd5ad1e5786d972b0a2085',
-            content: newNotes
 
-        }
+    const createNewNote = async (newNotes) => {
 
-        postNotes(newNs)
+        tokenUser(user.token)
+        await postNotes(newNotes)
         .then(note => {
             setNotes(prevNota => prevNota.concat(note))
         })
-
-        setNewNotes("")
     }
     
 
-    return (
-    <div>
-        {datosUser ? <p>{`${datosUser} ha iniciado sesion`}</p> : <p>Login</p>}
-<form onSubmit={handleLoginChange}>
-<input
-type='text'
-name='Username'
-placeholder='Username'
-value={username}
-onChange={({target}) => setUsername(target.value)}
-/>
-<input
-type='password'
-name='Password'
-placeholder='Pasword'
-value={password}
-onChange={({target}) => setPassword(target.value)}/>
-<button>login</button>
-</form>
-<p>{} </p>
-            <h1>Notas</h1>
-            <small>{loading ? console.log('cargando...') : console.log('carga finalizada')}</small>
-            <ol>
-                {notes.map(note => <RenderList key={note.pos} {...note}/>)}
-            </ol>
- 
-            <form onSubmit={createNote}>
-                <input type='text' onChange={handleChange} value={newNotes}/>
-                <button>crear nota</button>
-            </form>
-        </div>
 
-        )
+const loginForm = () => {
+    const hideWhenVisible = { display: loginVisible ? 'none' : '' }
+    const showWhenVisible = { display: loginVisible ? '' : 'none' }
+    return (
+        <div>
+          <div style={hideWhenVisible}>
+            <button onClick={() => setLoginVisible(true)}>log in</button>
+          </div>
+          <div style={showWhenVisible}>
+            <LoginForm
+              username={username}
+              password={password}
+              handleUsernameChange={({ target }) => setUsername(target.value)}
+              handlePasswordChange={({ target }) => setPassword(target.value)}
+              handleLogin={handleLogin}
+            />
+            <button onClick={() => setLoginVisible(false)}>cancel</button>
+          </div>
+        </div>
+      )
+    }
+
+
+
+
+return (
+
+    <div>
+
+        <h1>Notas</h1>
+
+        {!user && loginForm()}
+            {user &&
+            <div>
+            <p>{user.name} logged in</p>
+
+            <Togglable buttonLabel="new note">
+                <RenderCreateNotes createNote={createNewNote} userId={user.id}/>
+            </Togglable>
+            </div>
+            } 
+
+        <ul>
+            {notes.map(note => 
+            <RenderListNotes
+                key={note.pos}
+                note={note}
+            />
+            )}
+        </ul>
+                    
+    </div>
+
+    )
 }
 
 
