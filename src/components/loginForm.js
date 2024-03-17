@@ -1,39 +1,61 @@
+import { useState } from "react"
+import PropTypes from 'prop-types'
 
 
+const LoginForm = ({ axiosLogin }) => {
+const [username, setUsername] = useState('')
+const [password, setPassword] = useState('')
+const handleLogin = async (event) => {
+    event.preventDefault()
+    try{
+        
+    axiosLogin({
+        username,
+        password
+    })
 
-const LoginForm = ({ 
-    handleLogin,
-    handleUsernameChange,
-    handlePasswordChange,
-    username,
-    password
-}) => {
-    return (
-        <div>
-            <form onSubmit={handleLogin}>
+    setUsername('')
+    setPassword('')
+
+} catch (error){
+        console.log(error)
+    }
     
-<div>
-    usuario
-<input
-type='text'
-name='Username'
-placeholder='Username'
-value={username}
-onChange={handleUsernameChange}
-/>
-</div>
-<div>
-    contraseña
-<input
-type='password'
-name='Password'
-placeholder='Pasword'
-value={password}
-onChange={handlePasswordChange}/>
-</div>
-<button>login</button>
-</form>
+}
+
+LoginForm.propTypes = {
+    axiosLogin: PropTypes.func.isRequired
+}
+
+    return (
+         <div>
+            <form className="loginForm" onSubmit={handleLogin}>
+    
+        <div>
+            user
+                <input
+                id="username"
+                type='text'
+                name='Username'
+                placeholder='Username'
+                value={username}
+                onChange={({target}) => setUsername(target.value)}
+                />
         </div>
+        <div>
+            password
+                <input
+                id="password"
+                type='password'
+                name='Password'
+                placeholder='Pasword'
+                value={password}
+                onChange={({target}) => setPassword(target.value)}
+                />
+        </div>
+        <button id="loginSession">login</button>
+        </form>
+    </div>
         
     )
 }

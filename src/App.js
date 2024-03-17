@@ -1,31 +1,30 @@
 import { RenderListNotes } from "./components/renderListNotes"
-import { useState, useEffect } from "react"
-import { getAllNotes, postNotes, tokenUser } from "./services/notes/axiosNotes"
+import { useState, useEffect, useRef } from "react"
+import { getAllNotes, postNotes, tokenUser, updatePost } from "./services/notes/axiosNotes"
 import { loginUser } from "./services/users.js/axiosUsers"
-import { RenderCreateNotes } from "./components/renderCreateNotes"
 import { LoginForm } from "./components/loginForm"
 import Togglable from "./components/togglable"
-
-
-
+import TogglableLogin from "./components/togglableLogin"
+import { CreateNotes } from "./components/createNewNotes"
 
 const App = () => {
-    
+
     const [notes, setNotes] = useState([])
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const [loginVisible, setLoginVisible] = useState(false)
     const [user, setUser] = useState('')
+    const [showAll, setShowAll] = useState(true)
+
+    const noteFormRef = useRef()
 
 
     useEffect(()=>{
         getAllNotes()
         .then(data => {
-            console.log('se encontro 2: ', data)
+            console.log('notas encontradas: ', data)
             setNotes(data)
         })
             
     }, [])
+    
 
 
     useEffect(() => {
@@ -38,15 +37,28 @@ const App = () => {
       }, [])
 
 
+      const notesToShow = showAll ? notes
+      : notes.filter(note => note.important === true)
 
-    const handleLogin = async (event) => {
-        event.preventDefault()
+      const toggleImportanceOf = async (id) => {
+       
+        const note = notes.find(e => e.id === id)
+        const noteChanged = {...note, important: !note.important}
+    
+        await updatePost(id, noteChanged)
+        .then(data => {
+            console.log('recibido desde server: ', data)
+            setNotes(notes.map(note => note.id !== id ? note : data))
+        })
+        
+      }
+ 
+
+
+    const axiosLogin = async (userDate) => {
         try{
-        const datos = {
-            username,
-            password
-        }
-        await loginUser(datos)
+   
+        await loginUser(userDate)
         .then(user => {
             console.log(user.name, ' ha iniciado sesion')
             console.log('con id: ', user.id)
@@ -54,9 +66,9 @@ const App = () => {
                 'userSession', JSON.stringify(user)
               )
             setUser(user)
-            setUsername('')
-            setPassword('')
+            tokenUser(user.token)
         })
+        
     } catch (error){
             console.log(error)
         }
@@ -67,7 +79,7 @@ const App = () => {
 
     const createNewNote = async (newNotes) => {
 
-        tokenUser(user.token)
+        noteFormRef.current.toggleVisibility()
         await postNotes(newNotes)
         .then(note => {
             setNotes(prevNota => prevNota.concat(note))
@@ -77,33 +89,22 @@ const App = () => {
 
 
 const loginForm = () => {
-    const hideWhenVisible = { display: loginVisible ? 'none' : '' }
-    const showWhenVisible = { display: loginVisible ? '' : 'none' }
     return (
-        <div>
-          <div style={hideWhenVisible}>
-            <button onClick={() => setLoginVisible(true)}>log in</button>
-          </div>
-          <div style={showWhenVisible}>
+    <div>
+        <TogglableLogin buttonLabel='login'>
             <LoginForm
-              username={username}
-              password={password}
-              handleUsernameChange={({ target }) => setUsername(target.value)}
-              handlePasswordChange={({ target }) => setPassword(target.value)}
-              handleLogin={handleLogin}
+              axiosLogin={axiosLogin}
             />
-            <button onClick={() => setLoginVisible(false)}>cancel</button>
-          </div>
+        </TogglableLogin>
         </div>
-      )
+        
+        )
     }
 
 
+return(
 
-
-return (
-
-    <div>
+     <div>
 
         <h1>Notas</h1>
 
@@ -111,18 +112,23 @@ return (
             {user &&
             <div>
             <p>{user.name} logged in</p>
-
-            <Togglable buttonLabel="new note">
-                <RenderCreateNotes createNote={createNewNote} userId={user.id}/>
+            <div>
+        <button onClick={() => setShowAll(!showAll)}>
+            {showAll ? 'watch only important notes' : 'watch all notes' }
+        </button>
+      </div>
+            <Togglable buttonLabel="new note" ref={noteFormRef}>
+                <CreateNotes createNote={createNewNote} userId={user.id}/>
             </Togglable>
             </div>
             } 
 
         <ul>
-            {notes.map(note => 
+            {notesToShow.map((note, i) =>
             <RenderListNotes
-                key={note.pos}
+                key={i}
                 note={note}
+                toggleImportance={() => toggleImportanceOf(note.id)}
             />
             )}
         </ul>
