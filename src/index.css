@@ -6,9 +6,34 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+h1 {
+  color: brown;
+}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
- 
+
+.noteList {
+  display:flex;
+  background-color: rgb(196, 249, 213);
+  color:black;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  font-size: small;
+}
+
+.nameUser {
+  display: flex;
+  align-content: flex-start;
+}
+
+.loggedUser {
+  display: flex;
+  color:rgb(31, 202, 26);
+}
+
+.like {
+  color: rgb(228, 48, 48);
+  font-size: 12px;
+}

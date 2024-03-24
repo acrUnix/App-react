@@ -3,8 +3,10 @@ import PropTypes from 'prop-types'
 
 
 const LoginForm = ({ axiosLogin }) => {
+
 const [username, setUsername] = useState('')
 const [password, setPassword] = useState('')
+
 const handleLogin = async (event) => {
     event.preventDefault()
     try{
@@ -20,8 +22,8 @@ const handleLogin = async (event) => {
 } catch (error){
         console.log(error)
     }
-    
 }
+
 
 LoginForm.propTypes = {
     axiosLogin: PropTypes.func.isRequired

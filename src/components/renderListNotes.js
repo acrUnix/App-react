@@ -12,34 +12,35 @@ const RenderListNotes = ({note, toggleImportance})=>{
     const Visibility = () => {
         setVisible(!visible)
     }
-
+    
     const name = note.users[0].name
     const id = note.users[0].id
     const username = note.users[0].username
+ 
 
     return(
 
     <li className="note">
-        <h3><strong>{note.title}  -  liks {43}</strong></h3>
-        <p>{note.gender}</p>
-        <p>{note.content}</p>
-        
-    <button onClick={toggleImportance}>{label}</button>
+                <h3><strong>{note.title} </strong> - <strong className="like"> me gusta {43}</strong></h3>
+                <p>{note.gender}</p>
+                <p>{note.content}</p>
+                
+            <button onClick={toggleImportance}>{label}</button>
 
-      <div style={hideVisible}>
-            <button onClick={Visibility}>mostrar detalles</button>
-      </div>
+            <div style={hideVisible}>
+                    <button onClick={Visibility}>mostrar detalles</button>
+            </div>
 
-      <div style={showVisible}>
-        <h5>Datos del autor</h5>
-            <p>user:   <strong>{name ? name : 'sin nombre'}</strong></p>
-            <p>id:   {id ? id : 'sin id'}</p>
-            <p>username:  {username ? username : 'sin username'}</p>
-       </div>
-        
-        <div style={showVisible}>
-            <button onClick={Visibility}>ocultar</button>
-        </div>
+            <div style={showVisible}>
+                <h5>Datos del autor</h5>
+                    <p>user:   <strong>{name ? name : 'sin nombre'}</strong></p>
+                    <p>id:   {id ? id : 'sin id'}</p>
+                    <p>username:  {username ? username : 'sin username'}</p>
+            </div>
+                
+                <div style={showVisible}>
+                    <button onClick={Visibility}>ocultar</button>
+                </div>
     </li>
     
     )
